@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: virtualizacao
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-importante
+  namespace: virtualizacao
+  labels:
+    id: muito-importante
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      id: muito-importante
+  template:
+    metadata:
+      labels:
+        id: muito-importante
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            id: muito-importante
+      containers:
+      - name: container1
+        image: nginx:1.17.6-alpine
+        ports:
+        - containerPort: 80
+      - name: container2
+        image: kubernetes/pause
